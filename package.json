@@ -1,0 +1,1 @@
+{"name":"perspective-lab","private":true,"type":"module","scripts":{"test":"node tests/engine.test.mjs"},"engines":{"node":">=22"}}

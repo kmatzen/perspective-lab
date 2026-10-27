@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+import {fit,detect,residual} from '../dist/engine.js';
+const line=(x1,y1,x2,y2)=>({x1,y1,x2,y2,len:Math.hypot(x2-x1,y2-y1)});
+const vp=[300,180,1],ls=Array.from({length:12},(_,i)=>{const x=i*50,y=450;return line(x,y,x+(300-x)*.4,y+(180-y)*.4)});
+let r=fit(ls);assert.equal(r.groups.length,1);assert.ok(r.support>.99);assert.ok(residual(ls[0],r.groups[0].v)<1e-5);
+const parallel=Array.from({length:8},(_,i)=>line(10,i*30,250,i*30));r=fit(parallel);assert.ok(Math.abs(r.groups[0].v[2])<1e-9);assert.equal(r.support,1);
+assert.equal(fit([]).support,0);assert.deepEqual(detect(new Uint8ClampedArray(100*100*4),100,100),[]);
+const pixels=new Uint8ClampedArray(120*120*4);for(let y=0;y<120;y++)for(let x=0;x<120;x++){let i=(y*120+x)*4;pixels[i]=pixels[i+1]=pixels[i+2]=x>58&&x<64?255:0;pixels[i+3]=255;}assert.ok(detect(pixels,120,120).length>0);
+const mixed=Array.from({length:36},(_,i)=>{let a=i*2.399963,x=100+(i*47)%400,y=50+(i*83)%350;return line(x,y,x+80*Math.cos(a),y+80*Math.sin(a));});assert.ok(fit(mixed).support<.8);
+console.log('Passed: finite convergence, parallel directions, no evidence, pixel edge detection, conflicting directions.');
